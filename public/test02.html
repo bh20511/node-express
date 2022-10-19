@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        h1{
+            text-align: center;
+        }
+        .photos {
+            display: flex;
+            margin:auto;
+            flex-wrap: wrap;
+            width: 600px;
+            height: 600px;
+
+        }
+
+        .photo {
+            width: 33.3333%;
+            height: 33.3333%;
+            box-shadow: 1px 2px 4px #000;
+            text-align: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .photo img {
+            width: 98%;
+        }
+
+        .photo h2 {
+            position: absolute;
+            bottom: 0;
+            right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>拼圖大挑戰,完成有獎勵</h1>
+
+    <div class="photos">
+       
+    </div>
+
+
+    <script>
+        let photos = document.querySelector(".photos");
+
+        function shuffle(arr) {
+            var i,
+                j,
+                temp;
+            for (i = arr.length - 1; i > 0; i--) {
+                j = Math.floor(Math.random() * (i + 1));
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+            return arr;
+        };
+        let tt = ["./imgg/9.jpg", "./imgg/8.jpg", "./imgg/7.jpg",
+            "./imgg/6.jpg", "./imgg/5.jpg", "./imgg/4.jpg",
+            "./imgg/3.jpg", "./imgg/2.jpg", "./imgg/1.jpg"];
+
+        let question = shuffle(tt);
+        let bananas = question.map((data) => {
+            return `<div class="photo">
+            <img src="${data}" alt="">
+        </div>`
+        })
+        photos.innerHTML = bananas.join('');
+
+        
+        let arrAll = [];
+        let photoAll = document.querySelectorAll('.photo');
+        let container = null;
+        let tempindex;
+        photoAll.forEach(function (photo) {
+            photo.ondragstart = function () {
+                console.log(1)
+                container = this;
+                const index = Array.from(photos.children).indexOf(photo);
+                console.log('index', index);
+                tempindex = index;
+            }
+            photo.ondragover = function () {
+                event.preventDefault();
+            }
+            photo.ondrop = function () {
+                if (container != null && container != this) {
+                    const index = Array.from(photos.children).indexOf(this);
+                    console.log('target', index);
+                    console.log('tempindex', tempindex);
+                    let temp = document.createElement('div');
+                    photos.replaceChild(temp, this);
+                    photos.replaceChild(this, container);
+                    photos.replaceChild(container, temp);
+                    
+                    let tempV = arrAll[tempindex];
+                    arrAll[tempindex] = arrAll[index];
+                    arrAll[index] = tempV;
+                    
+                    const img = document.querySelectorAll('img');
+                    let img_arr = [];
+                    for (let i = 0; i < img.length; i++) {
+                        let img_src = img[i].getAttribute('src');
+                        img_arr.push(img_src);
+
+                    }
+                    
+                    let answer = ["./imgg/9.jpg", "./imgg/8.jpg", "./imgg/7.jpg",
+                        "./imgg/6.jpg", "./imgg/5.jpg", "./imgg/4.jpg",
+                        "./imgg/3.jpg", "./imgg/2.jpg", "./imgg/1.jpg"];
+
+
+                    let a = false;
+
+                    if (JSON.stringify(answer) == JSON.stringify(img_arr)) {
+                        a = true;
+                    }
+                    if (a) {
+                        
+                        while(photos.hasChildNodes()){
+                            photos.removeChild(photos.lastChild);
+                        }
+                        
+                        photos.innerHTML= `<div class="photo" style="width:900px">
+            <img src="./imgg/dog.png" alt="" >
+        </div>`
+                        
+                        
+                    }
+                }
+
+            }
+        })
+
+
+        let answer = ["./imgg/9.jpg", "./imgg/8.jpg", "./imgg/7.jpg",
+            "./imgg/6.jpg", "./imgg/5.jpg", "./imgg/4.jpg",
+            "./imgg/3.jpg", "./imgg/2.jpg", "./imgg/1.jpg"];
+
+        // console.log(JSON.stringify(answer));
+
+    </script>
+</body>
+
+</html>

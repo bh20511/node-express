@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .photo {
+            display: inline-block;
+            vertical-align: bottom;
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 1px solid blue;
+        }
+
+        .photo img {
+            /* position: absolute; */
+            width: 60%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form name="form1">
+        <input type="file" accept="image/*" name="photos" multiple onchange="upload()">
+    </form>
+    <div id="photos">
+        <div class="photo">
+            <img src="" alt="">
+        </div>
+    </div>
+    <script>
+        // const item_tpl_func = ({ filename }) => {
+        //     return `<div class="photo">
+        //     <img src="/uploads/${filename}" alt="">
+        // </div>`
+        //         ;
+        // }
+        let photos = document.querySelector("#photos")
+        let arrAll = [];
+        async function upload() {
+            const fd = new FormData(document.form1);
+
+            const r = await fetch('/try-upload2', {
+                method: 'POST',
+                body: fd
+            });
+
+            const result = await r.json();
+            console.log(result);
+
+            // if(result && result.length){
+            //     result.forEach(obj=>{
+            //         str += item_tpl_func(obj);
+            //     })
+            // }
+            if (result && result.length) {
+                let arr = result.map(obj => {
+                    return `<div class="photo">
+                                 <img src="/uploads/${obj.filename}" alt="">
+                                 <h2>X</h2>
+                            </div>`
+                });
+                arrAll = arrAll.concat(arr);
+                photos.innerHTML = arrAll.join('');
+                console.log(arrAll);
+            }
+            // document.querySelector('#photo-div').innerHTML = str;
+            let allh2 = document.querySelectorAll("h2");
+
+            allh2.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    let card = e.target.parentNode;
+                    // console.log(e.target.parentNode)
+                    const index = Array.from(card.parentElement.children).indexOf(card);
+                    console.log('index',index);
+                    arrAll.splice(index,1);
+                    console.log(arrAll);
+                    console.log(arrAll.length);
+                    photos.removeChild(card);
+                })
+            });
+        }
+
+
+    </script>
+
+    <!-- map改寫 加圖刪圖 調整位子 -->
+</body>
+
+</html>

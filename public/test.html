@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .photos {
+            display: flex;
+            width:910px;
+            gap: 20px;
+        }
+
+        .photo {
+            width: 300px;
+            height: 300px;
+            box-shadow: 1px 2px 4px #000;
+            text-align: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .photo img {
+            width: 80%;
+        }
+
+        .photo h2 {
+            position: absolute;
+            bottom: 0;
+            right: 20px;
+        }
+        .photo .remove{
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <form name="form1">
+        <input type="file" accept="image/*" name="photos" onchange="upload()" multiple>
+    </form>
+    <div class="photos">
+
+    </div>
+
+
+    <script>
+
+        let photos = document.querySelector(".photos");
+        let arrAll = [];
+
+        async function upload() {
+            const fd = new FormData(document.form1);
+
+            const r = await fetch('/try-upload2', {
+                method: 'POST',
+                body: fd
+            });
+
+            const result = await r.json();
+
+            if (result && result.length) {
+                let arr = result.map(obj => {
+                    return `<div class="photo">
+<img src="/uploads/${obj.filename}" alt="">
+<h2> X </h2>
+</div>`;
+                });
+                arrAll = arrAll.concat(arr);
+                photos.innerHTML = arrAll.join('');
+            }
+
+            let removebtns = document.querySelectorAll("h2");
+
+
+            removebtns.forEach(btn => {
+                // console.log(btn);
+                btn.addEventListener('click', (e) => {
+                    console.log(e.target.parentElement);
+                    let card = e.target.parentElement;
+
+                    // const index = Array.from(card.parentElement.children).indexOf(card);
+                    const index = Array.from(photos.children).indexOf(card);
+                    console.log('index', index);
+                    arrAll.splice(index, 1);
+                    console.log(arrAll);
+                    console.log(arrAll.length);
+                    photos.removeChild(card);
+                })
+            });
+
+            let photoAll = document.querySelectorAll('.photo');
+            let container = null;
+            let tempindex;
+            photoAll.forEach(function (photo) {
+                photo.ondragstart = function () {
+                    container = this;
+                    const index = Array.from(photos.children).indexOf(photo);
+                    console.log('index', index);
+                    tempindex = index;
+                }
+                photo.ondragover = function () {
+                    event.preventDefault();
+                }
+                photo.ondrop = function () {
+                    if (container != null && container != this) {
+                        const index = Array.from(photos.children).indexOf(this);
+                        console.log('target', index);
+                        console.log('tempindex', tempindex);
+                        let temp = document.createElement('div');
+                        photos.replaceChild(temp, this);
+                        photos.replaceChild(this, container);
+                        photos.replaceChild(container, temp);
+
+                        // let tempV = arrAll[2];
+                        // arrAll[2] = arrAll[0];
+                        // arrAllp[0] = tempV;
+
+                        let tempV = arrAll[tempindex];
+                        arrAll[tempindex] = arrAll[index];
+                        arrAll[index] = tempV;
+                    }
+
+                }
+
+
+
+            })
+
+
+            //f:upload ends
+        }
+
+
+
+
+
+    </script>
+</body>
+
+</html>
